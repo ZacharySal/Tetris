@@ -14,34 +14,38 @@ class Board:
         self.pieces = []
         self.game_over = False
         self.active_piece = None
+        self.score = 0
 
     def create_squares(self):
         for row in range(ROWS):
             for col in range(COLS):
                 self.squares[row][col] = Square(row, col)
 
-    def update_squares(self, piece):
-        for row, col in piece.indices:
-            self.squares[row][col].occupied = True
+    def update_squares(self):
+        for piece in self.pieces:
+            for row, col in piece.indices:
+                self.squares[row][col].occupied = True
+                # print(f'Square {row}, {col} is occupied')
 
-    def clear_squares(self, piece):
-        for row, col in piece.indices:
-            self.squares[row][col].occupied = False
+    def clear_squares(self):
+        for row in range(ROWS):
+            for col in range(COLS):
+                self.squares[row][col].occupied = False
 
     def add_piece(self):
         piece = Piece.createRandomPiece()
         if self.can_piece_fit(piece, 0, spawning=True):
+            # first we need to update the squares occupied status, then we need to check if a row is complete
+            self.is_row_complete()
             self.pieces.append(piece)
             self.active_piece = piece
-            self.update_squares(piece)
+            self.score += 10
         else:
             self.game_over = True
 
     def update_piece(self, direction):
         if self.can_piece_fit(self.active_piece, direction):
-            self.clear_squares(self.active_piece)
             self.active_piece.update_location(direction)
-            self.update_squares(self.active_piece)
 
     def is_col_empty(self):
         # check if there is piece below col
@@ -54,20 +58,52 @@ class Board:
 
         return True
 
-    def is_row_complete(self):
-        for row in range(ROWS):
-            complete = True
-            for col in range(COLS):
-                if not self.squares[row][col].occupied:
-                    # print(row, col, 'is not occupied')
-                    complete = False
-                else:
-                    # print(row, col, 'is occupied')
+    def shift_pieces_down(self, starting_row):
+        new_indices = []
+
+        for piece in self.pieces:
+            for row, col in piece.indices:
+                if row < starting_row:
+                    new_indices.append((row + 1, col))
+
+            piece.indices = new_indices
+            new_indices = []
+
+    def remove_indexes(self, test_row):
+        new_indices = []
+
+        for piece in self.pieces:
+            for row, col in piece.indices:
+                if row == test_row:
                     pass
-            if complete:
-                print(col, 'is a completed row!')
-                for col in range(COLS):
-                    self.squares[row][col].occupied = False
+                else:
+                    new_indices.append((row, col))
+
+            piece.indices = new_indices
+            print(piece.indices)
+            new_indices = []
+
+    def is_row_complete(self):
+
+        self.clear_squares()
+        self.update_squares()
+
+        for row in range(0, 20, 1):
+            row_complete = True
+            for col in range(1, 14, 1):
+                if self.squares[row][col].occupied is False:
+                    # print(f'Square {row}, {col} is not occupied')
+                    row_complete = False
+                elif self.squares[row][col].occupied is True:
+                    # print(f'Square {row}, {col} is occupied')
+                    pass
+            # if row is completed, we must delete all indexes of each piece in that row
+            if row_complete is True:
+                print(f'{row} is a completed row!')
+                # remove all indexes of completed row
+                self.remove_indexes(row)
+                # shift all pieces above it down one row
+                self.shift_pieces_down(row)
 
     def create_test_indices(self, curr_piece, direction):
         test_indices = []

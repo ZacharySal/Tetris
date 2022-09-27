@@ -9,7 +9,6 @@ from game import Game
 
 # TODO
 # check for row completion
-# add anchor identifier for each piece
 
 # CHANGE SQUARE TO OCCUPIED WHEN TAKEN BY A PIECE TO ALLOW FOR EASIER CHECKING OF OTHER THINGS
 
@@ -20,10 +19,12 @@ class Main:
         pygame.init()
         pygame.display.set_caption('Tetris')
 
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.screen = pygame.display.set_mode((WIDTH + 300, HEIGHT))
         self.board = Board()
         self.game = Game()
         self.clock = pygame.time.Clock()
+
+        self.screen.fill((0, 0, 0))
 
     def mainloop(self):
 
@@ -38,8 +39,10 @@ class Main:
         board.add_piece()
 
         while True:
+            screen.fill((0, 0, 0))
             game.show_bg(screen)
             game.show_pieces(board, screen)
+            game.show_game_info(board.score, screen)
 
             if board.game_over:
                 # print('MAIN')
@@ -47,9 +50,9 @@ class Main:
                 sys.exit()
 
             # add acceleration to active piece past y game ticks
-            if counter % 30 == 0 and counter != 0:
+            if counter % 20 == 0 and counter != 0:
                 pass
-                # board.update_piece(-1)
+                board.update_piece(-1)
                 # print('accelerating')
 
             for event in pygame.event.get():
@@ -67,6 +70,8 @@ class Main:
                         direction = RIGHT
                     elif event.key == pygame.K_r:
                         direction = ROTATE
+                    elif event.key == pygame.K_p:
+                        time.sleep(100)
                     else:
                         break
 
