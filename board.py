@@ -73,6 +73,7 @@ class Board:
         if self.can_piece_fit(self.active_piece, direction):
             self.active_piece.update_location(direction)
             self.set_piece_outline()
+            return
 
     def fast_drop(self):
         self.active_piece.indices = self.active_piece.trace
@@ -128,10 +129,10 @@ class Board:
                 self.completed_rows += 1
                 self.update_squares()
                 self.score += (100 * self.level)
-                if self.completed_rows % 1 == 0:
-                    self.config.level_up.play()
-                    self.level += 1
-                    if self.level != 11:
+                if self.completed_rows % 10 == 0:
+                    if self.level != MAX_LEVEL:
+                        self.config.level_up.play()
+                        self.level += 1
                         self.level_up = True
 
     def create_test_indices(self, curr_piece, direction):
@@ -182,24 +183,5 @@ class Board:
 
         self.active_piece.trace = ghost_piece.indices
         self.active_piece.ghost = False
-
-        #
-        # def ghost_fit(self, curr_piece, direction):
-        #
-        # test_indices = self.create_test_indices(curr_piece, direction)
-        #
-        # for test_row, test_col in test_indices:
-        #     if test_row > ROWS - 1:
-        #         return False
-        #     if test_col == 0 or test_col == 14:
-        #         return False
-        #
-        #     for piece in self.pieces:
-        #         for row, col in piece.indices:
-        #             if row == test_row and col == test_col and not piece.ghost:
-        #                 return False
-        #
-        # return True
-
 
 

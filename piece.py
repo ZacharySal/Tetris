@@ -1,19 +1,31 @@
 import math
 import random
+import os
 from const import *
 
 
 class Piece:
 
-    def __init__(self, indices, anchor):
+    def __init__(self, indices, anchor, img_path):
         self.indices = indices
-        self.color = random.choice(COLORS)
+        # self.color = random.choice(COLORS)
+        self.img_path = img_path
         self.anchor = anchor
         self.origin = (0, 0)
         self.row_offset = 0
         self.col_offset = 0
         self.trace = []
         self.ghost = False
+        self.rotations = []
+        self.rotation_index = 0
+
+
+    def update_possible_rotations(self):
+        if self.rotation_index == 0:
+            self.rotations.append((-1, 0))
+            self.rotations.append((-1, 1))
+            self.rotations.append((0, 2))
+            self.rotations.append((-1, 2))
 
     def update_origin(self):
         row = self.anchor[0] + self.row_offset
@@ -33,8 +45,10 @@ class Piece:
 
         self.update_origin()
 
+        origin_row, origin_col = self.origin
+
         for row, col in self.indices:
-            new_indices.append((row - self.origin[0], col - self.origin[1]))
+            new_indices.append((row - origin_row, col - origin_col))
 
         count = 0
         for row, col in new_indices:
@@ -43,7 +57,7 @@ class Piece:
 
         count = 0
         for row, col in new_indices:
-            new_indices[count] = row + self.origin[0], col + self.origin[1]
+            new_indices[count] = row + origin_row, col + origin_col
             count += 1
 
         return new_indices
@@ -72,5 +86,7 @@ class Piece:
         # create random Piece
         indices = random.choice(SHAPES)
         anchor = (indices[0][0], indices[0][1])
-        return Piece(indices, anchor)
+        color = random.choice(NEW_COLORS)
+        img_path = os.path.join(f'assets/images/resized_blocks/{color}.png')
+        return Piece(indices, anchor, img_path)
 

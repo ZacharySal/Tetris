@@ -7,8 +7,9 @@ from const import *
 from board import Board
 from game import Game
 
-# TODO
-
+# TODO:
+# Add wall kicks, improve rotation
+# Fin d suitable colors for UI/Pieces and new Fonts
 
 class Main:
 
@@ -17,9 +18,8 @@ class Main:
         pygame.init()
         pygame.display.set_caption('Tetris')
 
-
         self.board = Board()
-        self.game = Game()
+        self.game = Game(self.board)
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
         self.record = self.get_record()
@@ -48,7 +48,7 @@ class Main:
 
     def game_over_screen(self):
         self.screen.fill(BG_COLOR)
-        self.game.show_end_screen(self.board, self.board.score, self.record, self.screen)
+        self.game.show_end_screen(self.screen)
         self.set_record(self.board.score)
         self.record = self.get_record()
         pygame.display.update()
@@ -62,6 +62,7 @@ class Main:
                     if event.key == pygame.K_SPACE:
                         # create new game
                         self.board = Board()
+                        self.game = Game(self.board)
                         self.mainloop(True)
 
     def game_loop(self):
@@ -71,17 +72,26 @@ class Main:
         clock = self.clock
         board.add_piece()
 
+        move_map = {
+            pygame.K_s: DOWN,
+            pygame.K_a: LEFT,
+            pygame.K_d: RIGHT,
+        }
+
         pygame.time.set_timer(DROP, LEVEL_SPEED.get(board.level))
+        start_time = pygame.time.get_ticks()
 
         while not board.game_over:
 
             screen.fill(BG_COLOR)
-            game.show_bg(screen)
-            game.show_pieces(board, screen)
-            game.show_piece_trace(board, screen)
-            game.show_game_info(board, board.score, self.record, screen)
+            game.show_pieces(screen)
+            game.show_border(screen)
+            game.show_piece_trace(screen)
+            game.show_game_info(self.record, screen)
 
             if board.level_up:
+                print(f'Level: {board.level}')
+                print(f'Corresponding drop speed in ms: {LEVEL_SPEED.get(board.level)}')
                 pygame.time.set_timer(DROP, LEVEL_SPEED.get(board.level))
                 board.level_up = False
 
@@ -95,21 +105,17 @@ class Main:
                     board.update_piece(DOWN)
 
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_s:
-                        direction = DOWN
-                    elif event.key == pygame.K_a:
-                        direction = LEFT
-                    elif event.key == pygame.K_d:
-                        direction = RIGHT
-                    elif event.key == pygame.K_r:
-                        direction = ROTATE
-                    elif event.key == pygame.K_SPACE:
+                    if event.key == pygame.K_SPACE:
                         board.fast_drop()
-                        break
-                    else:
-                        break
+                    if event.key == pygame.K_r:
+                        board.update_piece(ROTATE)
 
-                    board.update_piece(direction)
+            pressed = pygame.key.get_pressed()
+            move = [move_map[key] for key in move_map if pressed[key]]
+
+            if move and start_time + 90 < pygame.time.get_ticks():
+                board.update_piece(move[0])
+                start_time = pygame.time.get_ticks()
 
             pygame.display.update()
             clock.tick(FPS)

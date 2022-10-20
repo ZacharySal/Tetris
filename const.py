@@ -1,5 +1,5 @@
-WIDTH = 750
-HEIGHT = 800
+WIDTH = 1000
+HEIGHT = 1000
 
 DOWN = -1
 LEFT = 0
@@ -9,13 +9,14 @@ AUTO = 4
 DROP = 5
 
 FPS = 60
+MAX_LEVEL = 10
 
 ROWS = 20
 COLS = 15
 SQUARE_WIDTH = 450 // COLS
-SQUARE_HEIGHT = HEIGHT // ROWS
+SQUARE_HEIGHT = 800 // ROWS
 
-BG_COLOR = (64, 65, 64)
+BG_COLOR = (0, 0, 0)
 
 # the anchor of each piece is the first index
 SHAPES = [
@@ -38,6 +39,15 @@ COLORS = [
     (255, 127, 0)
 ]
 
+NEW_COLORS = [
+    "red",
+    "lightblue",
+    "orange",
+    "pink",
+    "yellow",
+    "green"
+]
+
 LEVEL_SPEED = {
     1: 1000,
     2: 900,
@@ -46,9 +56,9 @@ LEVEL_SPEED = {
     5: 600,
     6: 500,
     7: 400,
-    9: 300,
-    10: 200,
-    11: 100
+    8: 300,
+    9: 200,
+    10: 100,
 }
 
 
