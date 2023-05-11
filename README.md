@@ -2,8 +2,6 @@
 
 A Tetris clone created in Python with Pygame
 
-# Images
-
 # Installation 
 
 Naviagte to the directory of the repo and open a new terminal there  
