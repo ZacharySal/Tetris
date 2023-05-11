@@ -9,7 +9,7 @@ from game import Game
 
 # TODO:
 # Add wall kicks, improve rotation
-# Fin d suitable colors for UI/Pieces and new Fonts
+# Find suitable colors for UI/Pieces and new Fonts
 
 class Main:
 
